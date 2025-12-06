@@ -137,7 +137,7 @@ class BudgetScreen extends ConsumerWidget {
                                 style: Theme.of(context).textTheme.bodySmall,
                               ),
                               Text(
-                                '\$${spending.toStringAsFixed(2)}',
+                                'RM${spending.toStringAsFixed(2)}',
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
                             ],
@@ -165,7 +165,7 @@ class BudgetScreen extends ConsumerWidget {
                                 style: Theme.of(context).textTheme.bodySmall,
                               ),
                               Text(
-                                '\$${remaining.abs().toStringAsFixed(2)}',
+                                'RM${remaining.abs().toStringAsFixed(2)}',
                                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                       color: remaining >= 0
                                           ? AppColors.success
@@ -178,7 +178,7 @@ class BudgetScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Limit: \$${category.monthlyLimit.toStringAsFixed(2)}',
+                        'Limit: RM${category.monthlyLimit.toStringAsFixed(2)}',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: Colors.grey[600],
                             ),

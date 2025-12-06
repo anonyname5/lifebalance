@@ -354,8 +354,9 @@ class ExpenseScreen extends ConsumerWidget {
               final notifier = ref.read(expenseNotifierProvider(today).notifier);
               await notifier.deleteExpense(expense.id!);
               
-              // Refresh totals
+              // Refresh totals and filtered expenses
               ref.invalidate(todayTotalExpensesProvider);
+              ref.invalidate(filteredExpensesProvider);
               
               if (context.mounted) {
                 Navigator.pop(context);

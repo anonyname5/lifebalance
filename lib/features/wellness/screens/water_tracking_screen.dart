@@ -4,6 +4,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/utils/date_helper.dart';
 import '../providers/water_provider.dart';
+import '../widgets/water_filter_widget.dart';
 import '../../../data/models/water_log.dart';
 import '../../../services/achievement_service.dart';
 import '../../insights/providers/achievement_provider.dart';
@@ -37,12 +38,50 @@ class _WaterTrackingScreenState extends ConsumerState<WaterTrackingScreen> {
   @override
   Widget build(BuildContext context) {
     final today = DateHelper.todayAsString();
-    final waterLogsAsync = ref.watch(waterNotifierProvider(today));
+    final filter = ref.watch(waterFilterProvider);
+    final waterLogsAsync = filter.hasActiveFilters
+        ? ref.watch(filteredWaterLogsProvider)
+        : ref.watch(waterNotifierProvider(today));
     final totalGlassesAsync = ref.watch(todayTotalGlassesProvider);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text(AppStrings.waterIntake),
+        actions: [
+          IconButton(
+            icon: Stack(
+              children: [
+                const Icon(Icons.filter_list),
+                if (filter.hasActiveFilters)
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 8,
+                        minHeight: 8,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            onPressed: () {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                ),
+                builder: (context) => const WaterFilterWidget(),
+              );
+            },
+          ),
+        ],
       ),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SingleChildScrollView(
@@ -84,7 +123,37 @@ class _WaterTrackingScreenState extends ConsumerState<WaterTrackingScreen> {
 
             // Water Logs List
             waterLogsAsync.when(
-              data: (logs) => _buildWaterLogsList(logs),
+              data: (logs) {
+                if (filter.hasActiveFilters && logs.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.search_off,
+                          size: 64,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.grey[600]
+                              : Colors.grey[400],
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No water logs found',
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                        const SizedBox(height: 8),
+                        TextButton(
+                          onPressed: () {
+                            ref.read(waterFilterProvider.notifier).clearFilters();
+                          },
+                          child: const Text('Clear filters'),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                return _buildWaterLogsList(logs);
+              },
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (error, stack) => Center(
                 child: Text('Error loading logs: $error'),
@@ -323,8 +392,9 @@ class _WaterTrackingScreenState extends ConsumerState<WaterTrackingScreen> {
     final notifier = ref.read(waterNotifierProvider(today).notifier);
     await notifier.addWater(glasses);
 
-    // Refresh total glasses
+    // Refresh total glasses and filtered water logs if filters are active
     ref.invalidate(todayTotalGlassesProvider);
+    ref.invalidate(filteredWaterLogsProvider);
 
     // Check for achievements
     final achievementService = AchievementService();
@@ -354,8 +424,9 @@ class _WaterTrackingScreenState extends ConsumerState<WaterTrackingScreen> {
     final notifier = ref.read(waterNotifierProvider(today).notifier);
     await notifier.deleteWater(id);
 
-    // Refresh total glasses
+    // Refresh total glasses and filtered water logs if filters are active
     ref.invalidate(todayTotalGlassesProvider);
+    ref.invalidate(filteredWaterLogsProvider);
 
     // Show snackbar
     if (mounted) {

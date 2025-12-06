@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/repositories/water_repository.dart';
 import '../../../data/models/water_log.dart';
 import '../../../core/utils/date_helper.dart';
+import '../widgets/water_filter_widget.dart';
 
 /// Water repository provider
 final waterRepositoryProvider = Provider<WaterRepository>((ref) {
@@ -78,3 +79,18 @@ final waterNotifierProvider = StateNotifierProvider.family<
     return WaterNotifier(repository, date);
   },
 );
+
+/// Filtered water logs provider
+final filteredWaterLogsProvider = FutureProvider<List<WaterLog>>((ref) async {
+  final repository = ref.watch(waterRepositoryProvider);
+  final filter = ref.watch(waterFilterProvider);
+  
+  return await repository.filterWaterLogs(
+    startDate: filter.startDate != null
+        ? DateHelper.formatDateForDb(filter.startDate!)
+        : null,
+    endDate: filter.endDate != null
+        ? DateHelper.formatDateForDb(filter.endDate!)
+        : null,
+  );
+});

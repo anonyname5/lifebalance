@@ -101,6 +101,16 @@ class _ExpenseFilterWidgetState extends ConsumerState<ExpenseFilterWidget> {
   final _searchController = TextEditingController();
   final _minAmountController = TextEditingController();
   final _maxAmountController = TextEditingController();
+  bool _controllersInitialized = false;
+
+  void _syncControllersWithFilter(ExpenseFilter filter) {
+    if (!_controllersInitialized) {
+      _searchController.text = filter.searchQuery ?? '';
+      _minAmountController.text = filter.minAmount != null ? filter.minAmount!.toStringAsFixed(2) : '';
+      _maxAmountController.text = filter.maxAmount != null ? filter.maxAmount!.toStringAsFixed(2) : '';
+      _controllersInitialized = true;
+    }
+  }
 
   @override
   void dispose() {
@@ -115,6 +125,9 @@ class _ExpenseFilterWidgetState extends ConsumerState<ExpenseFilterWidget> {
     final filter = ref.watch(expenseFilterProvider);
     final categoriesAsync = ref.watch(expenseCategoriesProvider);
     final currency = ref.watch(currencyProvider);
+    
+    // Sync controllers with filter state
+    _syncControllersWithFilter(filter);
 
     return Container(
       padding: const EdgeInsets.all(16),

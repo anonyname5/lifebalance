@@ -8,7 +8,7 @@ final currencyProvider = StateNotifierProvider<CurrencyNotifier, String>((ref) {
 });
 
 class CurrencyNotifier extends StateNotifier<String> {
-  CurrencyNotifier() : super(CurrencyHelper.usd) {
+  CurrencyNotifier() : super(CurrencyHelper.myr) {
     _loadCurrency();
   }
 

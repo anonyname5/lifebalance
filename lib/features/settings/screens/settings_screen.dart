@@ -585,7 +585,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           children: [
             RadioListTile<String>(
               title: const Text('US Dollar (USD)'),
-              subtitle: const Text('\$'),
+              subtitle: const Text('RM'),
               value: CurrencyHelper.usd,
               groupValue: currentCurrency,
               onChanged: (value) {

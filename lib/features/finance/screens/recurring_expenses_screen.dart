@@ -108,7 +108,7 @@ class RecurringExpensesScreen extends ConsumerWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        '\$${expense.amount.toStringAsFixed(2)}',
+                        'RM${expense.amount.toStringAsFixed(2)}',
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: AppColors.primary,

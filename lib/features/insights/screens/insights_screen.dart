@@ -466,7 +466,7 @@ class FinanceInsightsTab extends ConsumerWidget {
                   const SizedBox(height: 8),
                   currentMonthTotalAsync.when(
                     data: (total) => Text(
-                      '\$${total.toStringAsFixed(2)}',
+                      'RM${total.toStringAsFixed(2)}',
                       style: Theme.of(context).textTheme.displayMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: AppColors.primary,
@@ -504,7 +504,7 @@ class FinanceInsightsTab extends ConsumerWidget {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'Predicted Total: \$${prediction['predictedTotal'].toStringAsFixed(2)}',
+                      'Predicted Total: RM${prediction['predictedTotal'].toStringAsFixed(2)}',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: AppColors.primary,
@@ -512,11 +512,11 @@ class FinanceInsightsTab extends ConsumerWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Current: \$${prediction['currentSpending'].toStringAsFixed(2)} (${prediction['daysPassed']} days)',
+                      'Current: RM${prediction['currentSpending'].toStringAsFixed(2)} (${prediction['daysPassed']} days)',
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                     Text(
-                      'Last Month: \$${prediction['lastMonthTotal'].toStringAsFixed(2)}',
+                      'Last Month: RM${prediction['lastMonthTotal'].toStringAsFixed(2)}',
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                     if (prediction['differencePercentage'] != 0.0) ...[
@@ -678,7 +678,7 @@ class FinanceInsightsTab extends ConsumerWidget {
                       ),
                       title: Text(entry.key),
                       trailing: Text(
-                        '\$${entry.value.toStringAsFixed(2)}',
+                        'RM${entry.value.toStringAsFixed(2)}',
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
@@ -758,7 +758,7 @@ class FinanceInsightsTab extends ConsumerWidget {
               sideTitles: SideTitles(
                 showTitles: true,
                 getTitlesWidget: (value, meta) {
-                  return Text('\$${value.toInt()}');
+                  return Text('RM${value.toInt()}');
                 },
               ),
             ),
@@ -839,7 +839,7 @@ class FinanceInsightsTab extends ConsumerWidget {
                       ],
                     ),
                     Text(
-                      '\$${thisMonth.toStringAsFixed(2)}',
+                      'RM${thisMonth.toStringAsFixed(2)}',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: AppColors.primary,
@@ -852,7 +852,7 @@ class FinanceInsightsTab extends ConsumerWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        'Last month: \$${lastMonth.toStringAsFixed(2)}',
+                        'Last month: RM${lastMonth.toStringAsFixed(2)}',
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ),
