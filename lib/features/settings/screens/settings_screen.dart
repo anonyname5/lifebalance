@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../core/utils/page_transitions.dart';
 import '../../../services/preferences_service.dart';
 import '../../../services/notification_service.dart';
 import '../../../services/export_service.dart';
@@ -14,6 +15,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:cross_file/cross_file.dart';
 import 'dart:io';
 import 'profile_screen.dart';
+import 'privacy_policy_screen.dart';
 
 /// Settings screen
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -67,8 +69,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const ProfileScreen(),
+                PageTransitions.slideRoute(
+                  const ProfileScreen(),
                 ),
               );
             },
@@ -210,8 +212,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const ExpenseCategoriesScreen(),
+                PageTransitions.slideRoute(
+                  const ExpenseCategoriesScreen(),
                 ),
               );
             },
@@ -253,9 +255,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ListTile(
             leading: const Icon(Icons.description),
             title: const Text('Privacy Policy'),
+            subtitle: const Text('View our privacy policy and data practices'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
-              // TODO: Show privacy policy
+              Navigator.push(
+                context,
+                PageTransitions.slideRoute(
+                  const PrivacyPolicyScreen(),
+                ),
+              );
             },
           ),
         ],
