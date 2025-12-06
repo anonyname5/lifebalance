@@ -1,6 +1,5 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
-import 'package:timezone/data/latest_all.dart' as tz_data;
 import '../services/preferences_service.dart';
 
 /// Service for managing local notifications
@@ -56,8 +55,9 @@ class NotificationService {
     final enabled = await PreferencesService.getWaterRemindersEnabled();
     if (!enabled) return;
 
-    // Use unique ID based on hour to prevent conflicts
-    final notificationId = 1000 + hour; // IDs: 1008, 1010, 1012, etc.
+    // Use unique ID based on hour and minute to prevent conflicts
+    // Format: 1000 + (hour * 60 + minute) to ensure uniqueness
+    final notificationId = 1000 + (hour * 60 + minute);
 
     await _notifications.zonedSchedule(
       notificationId,
@@ -90,8 +90,9 @@ class NotificationService {
     final enabled = await PreferencesService.getMealRemindersEnabled();
     if (!enabled) return;
 
-    // Use unique ID based on hour and meal type to prevent conflicts
-    final notificationId = 2000 + hour + mealType.hashCode % 100; // IDs: 2008, 2013, 2019, etc.
+    // Use unique ID based on hour, minute, and meal type to prevent conflicts
+    // Format: 2000 + (hour * 60 + minute) + (mealType hash % 100)
+    final notificationId = 2000 + (hour * 60 + minute) + (mealType.hashCode % 100);
 
     await _notifications.zonedSchedule(
       notificationId,
@@ -122,7 +123,13 @@ class NotificationService {
 
   /// Cancel water reminders
   Future<void> cancelWaterReminders() async {
-    // Cancel all water reminder IDs (1000-1999 range)
+    // Get current schedules and cancel them
+    final schedules = await PreferencesService.getWaterReminderSchedules();
+    for (final schedule in schedules) {
+      final notificationId = 1000 + (schedule.hour * 60 + schedule.minute);
+      await _notifications.cancel(notificationId);
+    }
+    // Also cancel default schedule IDs for backward compatibility
     for (int hour = 8; hour <= 18; hour += 2) {
       await _notifications.cancel(1000 + hour);
     }
@@ -130,11 +137,53 @@ class NotificationService {
 
   /// Cancel meal reminders
   Future<void> cancelMealReminders() async {
-    // Cancel all meal reminder IDs (2000-2999 range)
-    // Breakfast (8 AM), Lunch (13/1 PM), Dinner (19/7 PM)
-    await _notifications.cancel(2000 + 8); // Breakfast
-    await _notifications.cancel(2000 + 13); // Lunch
-    await _notifications.cancel(2000 + 19); // Dinner
+    // Get current schedules and cancel them
+    final schedules = await PreferencesService.getMealReminderSchedules();
+    for (final schedule in schedules) {
+      if (schedule.mealType != null) {
+        final notificationId = 2000 + (schedule.hour * 60 + schedule.minute) + (schedule.mealType!.hashCode % 100);
+        await _notifications.cancel(notificationId);
+      }
+    }
+    // Also cancel default schedule IDs for backward compatibility
+    await _notifications.cancel(2000 + 8);
+    await _notifications.cancel(2000 + 13);
+    await _notifications.cancel(2000 + 19);
+  }
+
+  /// Schedule all water reminders from saved schedules
+  Future<void> scheduleAllWaterReminders() async {
+    final enabled = await PreferencesService.getWaterRemindersEnabled();
+    if (!enabled) return;
+
+    final schedules = await PreferencesService.getWaterReminderSchedules();
+    final defaultMessage = await PreferencesService.getWaterReminderMessage();
+
+    for (final schedule in schedules) {
+      await scheduleWaterReminder(
+        hour: schedule.hour,
+        minute: schedule.minute,
+        message: schedule.message ?? defaultMessage,
+      );
+    }
+  }
+
+  /// Schedule all meal reminders from saved schedules
+  Future<void> scheduleAllMealReminders() async {
+    final enabled = await PreferencesService.getMealRemindersEnabled();
+    if (!enabled) return;
+
+    final schedules = await PreferencesService.getMealReminderSchedules();
+
+    for (final schedule in schedules) {
+      if (schedule.mealType != null) {
+        await scheduleMealReminder(
+          hour: schedule.hour,
+          minute: schedule.minute,
+          mealType: schedule.mealType!,
+        );
+      }
+    }
   }
 
   /// Schedule budget alert notification

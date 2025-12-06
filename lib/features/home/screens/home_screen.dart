@@ -7,6 +7,7 @@ import '../../../core/constants/app_strings.dart';
 import '../../../core/utils/date_helper.dart';
 import '../../../core/utils/page_transitions.dart';
 import '../../../core/widgets/gradient_card.dart';
+import '../../../core/widgets/animated_progress_indicator.dart';
 import '../../wellness/screens/wellness_screen.dart';
 import '../../wellness/screens/meal_logging_screen.dart';
 import '../../wellness/providers/water_provider.dart';
@@ -329,11 +330,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(8),
-                        child: LinearProgressIndicator(
-                            value: progress > 1.0 ? 1.0 : progress,
+                        child: AnimatedProgressIndicator(
+                          value: progress > 1.0 ? 1.0 : progress,
                           minHeight: 8,
                           backgroundColor: Colors.white.withOpacity(0.3),
-                          valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                          valueColor: Colors.white,
+                          duration: const Duration(milliseconds: 1000),
                         ),
                       ),
                       const SizedBox(height: 12),

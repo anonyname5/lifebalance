@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/widgets/animated_progress_indicator.dart';
 import '../../../data/models/achievement.dart';
 import '../providers/achievement_provider.dart';
 
@@ -63,11 +64,12 @@ class AchievementsScreen extends ConsumerWidget {
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 16),
-                    LinearProgressIndicator(
+                    AnimatedProgressIndicator(
                       value: (progress['progress'] as double) / 100,
                       backgroundColor: Colors.grey[300],
-                      valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                      valueColor: AppColors.primary,
                       minHeight: 8,
+                      duration: const Duration(milliseconds: 1000),
                     ),
                     const SizedBox(height: 8),
                     Text(

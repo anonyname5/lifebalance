@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../core/utils/page_transitions.dart';
 import '../../../services/preferences_service.dart';
 import '../../../services/notification_service.dart';
+import 'edit_water_reminders_screen.dart';
+import 'edit_meal_reminders_screen.dart';
 
 /// Notifications screen showing notification status and settings
 class NotificationsScreen extends ConsumerStatefulWidget {
@@ -104,26 +107,27 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
             context,
             icon: Icons.water_drop,
             title: 'Water Reminders',
-            description: 'Get reminded to drink water every 2 hours from 8 AM to 6 PM',
+            description: 'Get reminded to drink water at custom times',
             enabled: _waterRemindersEnabled,
             gradient: AppColors.waterGradient,
             onToggle: (value) async {
               await PreferencesService.setWaterRemindersEnabled(value);
               if (value) {
-                // Schedule water reminders
-                for (int hour = 8; hour <= 18; hour += 2) {
-                  await NotificationService.instance.scheduleWaterReminder(
-                    hour: hour,
-                    minute: 0,
-                    message: "Time for water! 💧 Don't forget to stay hydrated.",
-                  );
-                }
+                await NotificationService.instance.scheduleAllWaterReminders();
               } else {
                 await NotificationService.instance.cancelWaterReminders();
               }
               setState(() {
                 _waterRemindersEnabled = value;
               });
+            },
+            onEdit: () {
+              Navigator.push(
+                context,
+                PageTransitions.slideRoute(
+                  const EditWaterRemindersScreen(),
+                ),
+              ).then((_) => _loadPreferences());
             },
           ),
           const SizedBox(height: 12),
@@ -133,34 +137,27 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
             context,
             icon: Icons.restaurant,
             title: 'Meal Reminders',
-            description: 'Get reminded to log your meals (Breakfast: 8 AM, Lunch: 1 PM, Dinner: 7 PM)',
+            description: 'Get reminded to log your meals at custom times',
             enabled: _mealRemindersEnabled,
             gradient: AppColors.mealGradient,
             onToggle: (value) async {
               await PreferencesService.setMealRemindersEnabled(value);
               if (value) {
-                // Schedule meal reminders
-                await NotificationService.instance.scheduleMealReminder(
-                  hour: 8,
-                  minute: 0,
-                  mealType: 'Breakfast',
-                );
-                await NotificationService.instance.scheduleMealReminder(
-                  hour: 13,
-                  minute: 0,
-                  mealType: 'Lunch',
-                );
-                await NotificationService.instance.scheduleMealReminder(
-                  hour: 19,
-                  minute: 0,
-                  mealType: 'Dinner',
-                );
+                await NotificationService.instance.scheduleAllMealReminders();
               } else {
                 await NotificationService.instance.cancelMealReminders();
               }
               setState(() {
                 _mealRemindersEnabled = value;
               });
+            },
+            onEdit: () {
+              Navigator.push(
+                context,
+                PageTransitions.slideRoute(
+                  const EditMealRemindersScreen(),
+                ),
+              ).then((_) => _loadPreferences());
             },
           ),
           const SizedBox(height: 12),
@@ -260,6 +257,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     required bool enabled,
     required LinearGradient gradient,
     required Function(bool)? onToggle,
+    VoidCallback? onEdit,
   }) {
     return Card(
       child: Container(
@@ -269,57 +267,87 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
         ),
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: Row(
+          child: Column(
             children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: enabled
-                      ? Colors.white.withOpacity(0.2)
-                      : Colors.grey.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  icon,
-                  color: enabled ? Colors.white : AppColors.textSecondary,
-                  size: 24,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: enabled ? Colors.white : null,
-                          ),
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: enabled
+                          ? Colors.white.withOpacity(0.2)
+                          : Colors.grey.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      description,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: enabled
-                                ? Colors.white.withOpacity(0.9)
-                                : AppColors.textSecondary,
-                          ),
+                    child: Icon(
+                      icon,
+                      color: enabled ? Colors.white : AppColors.textSecondary,
+                      size: 24,
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: enabled ? Colors.white : null,
+                              ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          description,
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: enabled
+                                    ? Colors.white.withOpacity(0.9)
+                                    : AppColors.textSecondary,
+                              ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (onToggle != null)
+                    Switch(
+                      value: enabled && _notificationsEnabled,
+                      onChanged: _notificationsEnabled ? onToggle : null,
+                      activeColor: enabled ? Colors.white : AppColors.primary,
+                    )
+                  else
+                    Icon(
+                      enabled ? Icons.check_circle : Icons.info_outline,
+                      color: enabled ? Colors.white : AppColors.textSecondary,
+                    ),
+                ],
               ),
-              if (onToggle != null)
-                Switch(
-                  value: enabled && _notificationsEnabled,
-                  onChanged: _notificationsEnabled ? onToggle : null,
-                  activeColor: enabled ? Colors.white : AppColors.primary,
-                )
-              else
-                Icon(
-                  enabled ? Icons.check_circle : Icons.info_outline,
-                  color: enabled ? Colors.white : AppColors.textSecondary,
+              if (onEdit != null && enabled && _notificationsEnabled) ...[
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: onEdit,
+                    icon: Icon(
+                      Icons.edit,
+                      size: 18,
+                      color: enabled ? Colors.white : AppColors.primary,
+                    ),
+                    label: Text(
+                      'Customize Times',
+                      style: TextStyle(
+                        color: enabled ? Colors.white : AppColors.primary,
+                      ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(
+                        color: enabled ? Colors.white.withOpacity(0.5) : AppColors.primary.withOpacity(0.5),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
                 ),
+              ],
             ],
           ),
         ),

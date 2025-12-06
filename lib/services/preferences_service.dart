@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../core/utils/currency_helper.dart';
+import '../data/models/notification_schedule.dart';
 
 /// Service for managing app preferences
 class PreferencesService {
@@ -11,6 +13,9 @@ class PreferencesService {
   static const String _keyMonthlyIncome = 'monthly_income';
   static const String _keyCurrency = 'currency';
   static const String _keyThemeMode = 'theme_mode'; // 'light', 'dark', 'system'
+  static const String _keyWaterReminderSchedules = 'water_reminder_schedules';
+  static const String _keyMealReminderSchedules = 'meal_reminder_schedules';
+  static const String _keyWaterReminderMessage = 'water_reminder_message';
 
   /// Get water goal (default: 8)
   static Future<int> getWaterGoal() async {
@@ -106,6 +111,69 @@ class PreferencesService {
   static Future<bool> setThemeMode(String mode) async {
     final prefs = await SharedPreferences.getInstance();
     return await prefs.setString(_keyThemeMode, mode);
+  }
+
+  /// Get water reminder schedules
+  static Future<List<NotificationSchedule>> getWaterReminderSchedules() async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonString = prefs.getString(_keyWaterReminderSchedules);
+    if (jsonString == null) {
+      // Return default schedule (every 2 hours from 8 AM to 6 PM)
+      return [
+        for (int hour = 8; hour <= 18; hour += 2)
+          NotificationSchedule(
+            hour: hour,
+            minute: 0,
+            message: "Time for water! 💧 Don't forget to stay hydrated.",
+          ),
+      ];
+    }
+    final List<dynamic> jsonList = json.decode(jsonString);
+    return jsonList.map((json) => NotificationSchedule.fromMap(json as Map<String, dynamic>)).toList();
+  }
+
+  /// Set water reminder schedules
+  static Future<bool> setWaterReminderSchedules(List<NotificationSchedule> schedules) async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonList = schedules.map((s) => s.toMap()).toList();
+    final jsonString = json.encode(jsonList);
+    return await prefs.setString(_keyWaterReminderSchedules, jsonString);
+  }
+
+  /// Get meal reminder schedules
+  static Future<List<NotificationSchedule>> getMealReminderSchedules() async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonString = prefs.getString(_keyMealReminderSchedules);
+    if (jsonString == null) {
+      // Return default schedule
+      return [
+        NotificationSchedule(hour: 8, minute: 0, mealType: 'Breakfast'),
+        NotificationSchedule(hour: 13, minute: 0, mealType: 'Lunch'),
+        NotificationSchedule(hour: 19, minute: 0, mealType: 'Dinner'),
+      ];
+    }
+    final List<dynamic> jsonList = json.decode(jsonString);
+    return jsonList.map((json) => NotificationSchedule.fromMap(json as Map<String, dynamic>)).toList();
+  }
+
+  /// Set meal reminder schedules
+  static Future<bool> setMealReminderSchedules(List<NotificationSchedule> schedules) async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonList = schedules.map((s) => s.toMap()).toList();
+    final jsonString = json.encode(jsonList);
+    return await prefs.setString(_keyMealReminderSchedules, jsonString);
+  }
+
+  /// Get water reminder message
+  static Future<String> getWaterReminderMessage() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keyWaterReminderMessage) ?? "Time for water! 💧 Don't forget to stay hydrated.";
+  }
+
+  /// Set water reminder message
+  static Future<bool> setWaterReminderMessage(String message) async {
+    final prefs = await SharedPreferences.getInstance();
+    return await prefs.setString(_keyWaterReminderMessage, message);
   }
 
   /// Clear all preferences

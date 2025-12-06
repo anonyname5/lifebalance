@@ -7,6 +7,7 @@ import '../../../core/utils/date_helper.dart';
 import '../../../core/utils/currency_helper.dart';
 import '../../../core/utils/page_transitions.dart';
 import '../../../core/widgets/gradient_card.dart';
+import '../../../core/widgets/animated_value.dart';
 import '../providers/expense_provider.dart';
 import '../providers/expense_category_provider.dart';
 import '../widgets/expense_filter_widget.dart';
@@ -118,13 +119,15 @@ class ExpenseScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 8),
                   totalAsync.when(
-                    data: (total) => Text(
-                    CurrencyHelper.formatAmount(total, currency),
+                    data: (total) => AnimatedValue(
+                      value: total,
+                      formatter: (value) => CurrencyHelper.formatAmount(value, currency),
                       style: Theme.of(context).textTheme.displayMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                           color: Colors.white,
                           fontSize: 36,
                           ),
+                      duration: const Duration(milliseconds: 1000),
                     ),
                   loading: () => const CircularProgressIndicator(
                     valueColor: AlwaysStoppedAnimation<Color>(Colors.white),

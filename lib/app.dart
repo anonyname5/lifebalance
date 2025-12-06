@@ -37,6 +37,10 @@ class _AppState extends ConsumerState<App> {
     // Initialize notifications
     await NotificationService.instance.initialize();
 
+    // Reschedule notifications if enabled
+    await NotificationService.instance.scheduleAllWaterReminders();
+    await NotificationService.instance.scheduleAllMealReminders();
+
     // Check and auto-log recurring expenses
     final recurringService = RecurringExpenseService();
     await recurringService.checkAndLogRecurringExpenses();
