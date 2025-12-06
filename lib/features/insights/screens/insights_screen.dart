@@ -5,6 +5,9 @@ import 'package:intl/intl.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/utils/date_helper.dart';
+import '../../../core/widgets/animated_progress_indicator.dart';
+import '../../../core/widgets/animated_value.dart';
+import '../../../core/widgets/animated_chart.dart';
 import '../../settings/providers/currency_provider.dart';
 import '../../finance/providers/expense_provider.dart';
 import '../providers/streak_provider.dart';
@@ -235,12 +238,13 @@ class WellnessInsightsTab extends ConsumerWidget {
                     children: [
                       const Icon(Icons.water_drop, size: 32, color: AppColors.primary),
                       const SizedBox(height: 8),
-                      Text(
-                        '$waterStreak',
+                      AnimatedCounter(
+                        value: waterStreak,
                         style: Theme.of(context).textTheme.displayLarge?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: AppColors.primary,
                             ),
+                        duration: const Duration(milliseconds: 1000),
                       ),
                       Text(
                         'Day Water Streak',
@@ -269,12 +273,13 @@ class WellnessInsightsTab extends ConsumerWidget {
                     children: [
                       const Icon(Icons.restaurant, size: 32, color: AppColors.accent),
                       const SizedBox(height: 8),
-                      Text(
-                        '$mealStreak',
+                      AnimatedCounter(
+                        value: mealStreak,
                         style: Theme.of(context).textTheme.displayLarge?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: AppColors.accent,
                             ),
+                        duration: const Duration(milliseconds: 1000),
                       ),
                       Text(
                         'Day Meal Streak',
@@ -358,12 +363,14 @@ class WellnessInsightsTab extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        score.toStringAsFixed(1),
+                      AnimatedValue(
+                        value: score,
+                        formatter: (value) => value.toStringAsFixed(1),
                         style: Theme.of(context).textTheme.displayMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: scoreColor,
                             ),
+                        duration: const Duration(milliseconds: 1000),
                       ),
                       Text(
                         'out of 100',
@@ -393,11 +400,12 @@ class WellnessInsightsTab extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: 12),
-            LinearProgressIndicator(
+            AnimatedProgressIndicator(
               value: score / 100,
               backgroundColor: Colors.grey[300],
-              valueColor: AlwaysStoppedAnimation<Color>(scoreColor),
+              valueColor: scoreColor,
               minHeight: 8,
+              duration: const Duration(milliseconds: 1000),
             ),
           ],
         ),
@@ -467,12 +475,14 @@ class FinanceInsightsTab extends ConsumerWidget {
                   ),
                   const SizedBox(height: 8),
                   currentMonthTotalAsync.when(
-                    data: (total) => Text(
-                      'RM${total.toStringAsFixed(2)}',
+                    data: (total) => AnimatedValue(
+                      value: total,
+                      formatter: (value) => 'RM${value.toStringAsFixed(2)}',
                       style: Theme.of(context).textTheme.displayMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: AppColors.primary,
                           ),
+                      duration: const Duration(milliseconds: 1000),
                     ),
                     loading: () => const CircularProgressIndicator(),
                     error: (error, stack) => Text('Error: $error'),
@@ -632,8 +642,8 @@ class FinanceInsightsTab extends ConsumerWidget {
 
               return SizedBox(
                 height: 300,
-                child: PieChart(
-                  PieChartData(
+                child: AnimatedPieChart(
+                  pieChartData: PieChartData(
                     sectionsSpace: 2,
                     centerSpaceRadius: 60,
                     sections: categoryData.entries.map((entry) {
@@ -651,6 +661,7 @@ class FinanceInsightsTab extends ConsumerWidget {
                       );
                     }).toList(),
                   ),
+                  duration: const Duration(milliseconds: 1500),
                 ),
               );
             },
@@ -766,8 +777,8 @@ class FinanceInsightsTab extends ConsumerWidget {
 
     return SizedBox(
       height: 250,
-      child: LineChart(
-        LineChartData(
+      child: AnimatedLineChart(
+        lineChartData: LineChartData(
           gridData: FlGridData(show: true),
           titlesData: FlTitlesData(
             leftTitles: AxisTitles(
@@ -833,6 +844,7 @@ class FinanceInsightsTab extends ConsumerWidget {
             ),
           ],
         ),
+        duration: const Duration(milliseconds: 1500),
       ),
     );
   }

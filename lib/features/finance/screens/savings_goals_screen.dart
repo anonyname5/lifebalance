@@ -4,6 +4,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/utils/date_helper.dart';
 import '../../../core/utils/page_transitions.dart';
+import '../../../core/widgets/animated_progress_indicator.dart';
 import '../providers/savings_provider.dart';
 import '../../../data/models/savings_goal.dart';
 import 'add_savings_goal_screen.dart';
@@ -106,15 +107,14 @@ class SavingsGoalsScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 16),
                       // Progress Bar
-                      LinearProgressIndicator(
+                      AnimatedProgressIndicator(
                         value: goal.progress > 1.0 ? 1.0 : goal.progress,
                         minHeight: 8,
                         backgroundColor: Colors.grey[200],
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          goal.isGoalCompleted
-                              ? AppColors.success
-                              : AppColors.primary,
-                        ),
+                        valueColor: goal.isGoalCompleted
+                            ? AppColors.success
+                            : AppColors.primary,
+                        duration: const Duration(milliseconds: 1000),
                       ),
                       const SizedBox(height: 12),
                       Row(

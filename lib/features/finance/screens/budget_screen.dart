@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/utils/page_transitions.dart';
+import '../../../core/widgets/animated_progress_indicator.dart';
 import '../providers/budget_provider.dart';
 import '../../../data/models/budget_category.dart';
 import 'add_budget_category_screen.dart';
@@ -114,17 +115,16 @@ class BudgetScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 16),
                       // Progress Bar
-                      LinearProgressIndicator(
+                      AnimatedProgressIndicator(
                         value: progressValue > 1.0 ? 1.0 : progressValue,
                         minHeight: 8,
                         backgroundColor: Colors.grey[200],
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          progressValue >= 1.0
-                              ? AppColors.error
-                              : progressValue >= 0.8
-                                  ? AppColors.warning
-                                  : AppColors.success,
-                        ),
+                        valueColor: progressValue >= 1.0
+                            ? AppColors.error
+                            : progressValue >= 0.8
+                                ? AppColors.warning
+                                : AppColors.success,
+                        duration: const Duration(milliseconds: 1000),
                       ),
                       const SizedBox(height: 12),
                       Row(

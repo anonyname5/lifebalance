@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/utils/date_helper.dart';
+import '../../../core/widgets/animated_progress_indicator.dart';
+import '../../../core/widgets/animated_value.dart';
 import '../providers/water_provider.dart';
 import '../widgets/water_filter_widget.dart';
 import '../../../data/models/water_log.dart';
@@ -193,30 +195,30 @@ class _WaterTrackingScreenState extends ConsumerState<WaterTrackingScreen> {
                   ),
                 ),
               ),
-              // Progress ring
+              // Animated Progress ring
               SizedBox(
                 width: 280,
                 height: 280,
-                child: CircularProgressIndicator(
+                child: AnimatedCircularProgressIndicator(
                   value: progress > 1.0 ? 1.0 : progress,
                   strokeWidth: 20,
                   backgroundColor: Colors.transparent,
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    progress >= 1.0 ? AppColors.success : AppColors.primary,
-                  ),
+                  valueColor: progress >= 1.0 ? AppColors.success : AppColors.primary,
+                  duration: const Duration(milliseconds: 1500),
                 ),
               ),
               // Center content - stacked vertically
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    '$totalGlasses',
+                  AnimatedCounter(
+                    value: totalGlasses,
                     style: Theme.of(context).textTheme.displayLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                           fontSize: 64,
                           color: progress >= 1.0 ? AppColors.success : AppColors.primary,
                         ),
+                    duration: const Duration(milliseconds: 1000),
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -235,12 +237,13 @@ class _WaterTrackingScreenState extends ConsumerState<WaterTrackingScreen> {
                           .withOpacity(0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: Text(
-                    '$percentage%',
+                    child: AnimatedCounter(
+                      value: percentage,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: progress >= 1.0 ? AppColors.success : AppColors.primary,
                           ),
+                      duration: const Duration(milliseconds: 1000),
                     ),
                   ),
                 ],
