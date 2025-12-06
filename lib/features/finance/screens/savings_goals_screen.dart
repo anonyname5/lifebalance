@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/utils/date_helper.dart';
+import '../../../core/utils/page_transitions.dart';
 import '../providers/savings_provider.dart';
 import '../../../data/models/savings_goal.dart';
 import 'add_savings_goal_screen.dart';
@@ -24,8 +25,8 @@ class SavingsGoalsScreen extends ConsumerWidget {
             onPressed: () async {
               await Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const AddSavingsGoalScreen(),
+                PageTransitions.slideUpRoute(
+                  const AddSavingsGoalScreen(),
                 ),
               );
               ref.invalidate(savingsNotifierProvider);
@@ -127,7 +128,7 @@ class SavingsGoalsScreen extends ConsumerWidget {
                                 style: Theme.of(context).textTheme.bodySmall,
                               ),
                               Text(
-                                '\$${goal.currentAmount.toStringAsFixed(2)}',
+                                'RM${goal.currentAmount.toStringAsFixed(2)}',
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
                             ],
@@ -153,7 +154,7 @@ class SavingsGoalsScreen extends ConsumerWidget {
                                 style: Theme.of(context).textTheme.bodySmall,
                               ),
                               Text(
-                                '\$${goal.targetAmount.toStringAsFixed(2)}',
+                                'RM${goal.targetAmount.toStringAsFixed(2)}',
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
                             ],
@@ -208,7 +209,7 @@ class SavingsGoalsScreen extends ConsumerWidget {
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
           decoration: const InputDecoration(
             labelText: 'Amount (USD)',
-            prefixText: '\$',
+            prefixText: 'RM',
           ),
         ),
         actions: [
@@ -225,7 +226,7 @@ class SavingsGoalsScreen extends ConsumerWidget {
                 if (context.mounted) {
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Added \$${amount.toStringAsFixed(2)}')),
+                    SnackBar(content: Text('Added RM${amount.toStringAsFixed(2)}')),
                   );
                 }
               }

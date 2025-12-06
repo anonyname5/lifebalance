@@ -5,6 +5,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/utils/date_helper.dart';
 import '../../../core/utils/currency_helper.dart';
+import '../../../core/utils/page_transitions.dart';
 import '../../../core/widgets/gradient_card.dart';
 import '../providers/expense_provider.dart';
 import '../providers/expense_category_provider.dart';
@@ -70,8 +71,8 @@ class ExpenseScreen extends ConsumerWidget {
             onPressed: () async {
               await Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const AddExpenseScreen(),
+                PageTransitions.slideUpRoute(
+                  const AddExpenseScreen(),
                 ),
               );
               // Refresh expenses after adding
@@ -354,8 +355,9 @@ class ExpenseScreen extends ConsumerWidget {
               final notifier = ref.read(expenseNotifierProvider(today).notifier);
               await notifier.deleteExpense(expense.id!);
               
-              // Refresh totals
+              // Refresh totals and filtered expenses
               ref.invalidate(todayTotalExpensesProvider);
+              ref.invalidate(filteredExpensesProvider);
               
               if (context.mounted) {
                 Navigator.pop(context);

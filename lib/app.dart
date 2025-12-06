@@ -4,7 +4,7 @@ import 'package:timezone/data/latest_all.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 import 'core/constants/app_theme.dart';
 import 'core/constants/app_strings.dart';
-import 'features/home/screens/home_screen.dart';
+import 'core/screens/splash_screen.dart';
 import 'features/settings/providers/theme_provider.dart';
 import 'services/notification_service.dart';
 import 'services/recurring_expense_service.dart';
@@ -52,7 +52,7 @@ class _AppState extends ConsumerState<App> {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeMode,
-      home: const HomeScreen(),
+      home: const SplashScreen(),
     );
   }
 }

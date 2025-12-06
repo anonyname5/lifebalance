@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../core/utils/page_transitions.dart';
 import '../providers/expense_category_provider.dart';
 import '../../../data/models/expense_category.dart';
 import 'add_edit_category_screen.dart';
@@ -24,8 +25,8 @@ class ExpenseCategoriesScreen extends ConsumerWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => const AddEditCategoryScreen(),
+                  PageTransitions.slideUpRoute(
+                    const AddEditCategoryScreen(),
                   ),
                 );
               },
@@ -119,8 +120,8 @@ class ExpenseCategoriesScreen extends ConsumerWidget {
             ? () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => AddEditCategoryScreen(category: category),
+                  PageTransitions.slideUpRoute(
+                    AddEditCategoryScreen(category: category),
                   ),
                 );
               }

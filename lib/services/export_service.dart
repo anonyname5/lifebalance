@@ -251,7 +251,7 @@ class ExportService {
                         ),
                         pw.Padding(
                           padding: const pw.EdgeInsets.all(4),
-                          child: pw.Text('\$${expense.amount.toStringAsFixed(2)}'),
+                          child: pw.Text('RM${expense.amount.toStringAsFixed(2)}'),
                         ),
                         pw.Padding(
                           padding: const pw.EdgeInsets.all(4),

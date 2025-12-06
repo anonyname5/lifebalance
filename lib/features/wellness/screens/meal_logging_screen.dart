@@ -4,6 +4,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/utils/date_helper.dart';
 import '../providers/meal_provider.dart';
+import '../widgets/meal_filter_widget.dart';
 import '../../../data/models/meal_log.dart';
 import '../../../services/achievement_service.dart';
 import '../../insights/providers/achievement_provider.dart';
@@ -42,11 +43,49 @@ class _MealLoggingScreenState extends ConsumerState<MealLoggingScreen> {
   @override
   Widget build(BuildContext context) {
     final today = DateHelper.todayAsString();
-    final mealLogsAsync = ref.watch(mealNotifierProvider(today));
+    final filter = ref.watch(mealFilterProvider);
+    final mealLogsAsync = filter.hasActiveFilters
+        ? ref.watch(filteredMealLogsProvider)
+        : ref.watch(mealNotifierProvider(today));
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Meal Logging'),
+        actions: [
+          IconButton(
+            icon: Stack(
+              children: [
+                const Icon(Icons.filter_list),
+                if (filter.hasActiveFilters)
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 8,
+                        minHeight: 8,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            onPressed: () {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                ),
+                builder: (context) => const MealFilterWidget(),
+              );
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -71,7 +110,37 @@ class _MealLoggingScreenState extends ConsumerState<MealLoggingScreen> {
 
             // Meal Logs List
             mealLogsAsync.when(
-              data: (logs) => _buildMealLogsList(logs),
+              data: (logs) {
+                if (filter.hasActiveFilters && logs.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.search_off,
+                          size: 64,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.grey[600]
+                              : Colors.grey[400],
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No meals found',
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                        const SizedBox(height: 8),
+                        TextButton(
+                          onPressed: () {
+                            ref.read(mealFilterProvider.notifier).clearFilters();
+                          },
+                          child: const Text('Clear filters'),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                return _buildMealLogsList(logs);
+              },
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (error, stack) => Center(
                 child: Text('Error loading meals: $error'),
@@ -188,21 +257,30 @@ class _MealLoggingScreenState extends ConsumerState<MealLoggingScreen> {
   }
 
   Future<void> _logMeal(String mealType) async {
-    final now = DateTime.now();
-    final today = DateHelper.todayAsString();
-    final notifier = ref.read(mealNotifierProvider(today).notifier);
-
     // Show dialog for optional notes
-    final notes = await showDialog<String>(
+    final result = await showDialog<String>(
       context: context,
       builder: (context) => _buildMealNotesDialog(mealType),
     );
 
+    // If user clicked Cancel, result will be null - don't log the meal
+    if (result == null) {
+      return;
+    }
+
+    // User clicked Save, proceed with logging
+    final now = DateTime.now();
+    final today = DateHelper.todayAsString();
+    final notifier = ref.read(mealNotifierProvider(today).notifier);
+
     await notifier.addMeal(
       mealType: mealType,
       dateTime: now,
-      notes: notes,
+      notes: result.isEmpty ? null : result,
     );
+
+    // Refresh filtered meals if filters are active
+    ref.invalidate(filteredMealLogsProvider);
 
     // Check for achievements after logging
     final achievementService = AchievementService();
@@ -257,6 +335,9 @@ class _MealLoggingScreenState extends ConsumerState<MealLoggingScreen> {
     final today = DateHelper.todayAsString();
     final notifier = ref.read(mealNotifierProvider(today).notifier);
     await notifier.deleteMeal(id);
+    
+    // Refresh filtered meals if filters are active
+    ref.invalidate(filteredMealLogsProvider);
 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(

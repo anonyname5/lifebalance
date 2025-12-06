@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../core/utils/page_transitions.dart';
 import '../providers/recurring_expense_provider.dart';
 import '../../../data/models/recurring_expense.dart';
 import 'add_recurring_expense_screen.dart';
@@ -26,8 +27,8 @@ class RecurringExpensesScreen extends ConsumerWidget {
             onPressed: () async {
               await Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const AddRecurringExpenseScreen(),
+                PageTransitions.slideUpRoute(
+                  const AddRecurringExpenseScreen(),
                 ),
               );
               ref.invalidate(recurringExpenseNotifierProvider);
@@ -108,7 +109,7 @@ class RecurringExpensesScreen extends ConsumerWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        '\$${expense.amount.toStringAsFixed(2)}',
+                        'RM${expense.amount.toStringAsFixed(2)}',
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: AppColors.primary,

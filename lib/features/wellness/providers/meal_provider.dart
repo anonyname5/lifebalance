@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/repositories/meal_repository.dart';
 import '../../../data/models/meal_log.dart';
 import '../../../core/utils/date_helper.dart';
+import '../widgets/meal_filter_widget.dart';
 
 /// Meal repository provider
 final mealRepositoryProvider = Provider<MealRepository>((ref) {
@@ -76,3 +77,20 @@ final mealNotifierProvider = StateNotifierProvider.family<
     return MealNotifier(repository, date);
   },
 );
+
+/// Filtered meal logs provider
+final filteredMealLogsProvider = FutureProvider<List<MealLog>>((ref) async {
+  final repository = ref.watch(mealRepositoryProvider);
+  final filter = ref.watch(mealFilterProvider);
+  
+  return await repository.filterMealLogs(
+    mealType: filter.mealType,
+    startDate: filter.startDate != null
+        ? DateHelper.formatDateForDb(filter.startDate!)
+        : null,
+    endDate: filter.endDate != null
+        ? DateHelper.formatDateForDb(filter.endDate!)
+        : null,
+    searchQuery: filter.searchQuery,
+  );
+});

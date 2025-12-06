@@ -22,7 +22,7 @@ class CurrencyHelper {
       case myr:
         return 'RM';
       default:
-        return '\$';
+        return 'RM';
     }
   }
 

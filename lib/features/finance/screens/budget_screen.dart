@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../core/utils/page_transitions.dart';
 import '../providers/budget_provider.dart';
 import '../../../data/models/budget_category.dart';
 import 'add_budget_category_screen.dart';
@@ -23,8 +24,8 @@ class BudgetScreen extends ConsumerWidget {
             onPressed: () async {
               await Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const AddBudgetCategoryScreen(),
+                PageTransitions.slideUpRoute(
+                  const AddBudgetCategoryScreen(),
                 ),
               );
               ref.invalidate(budgetProgressProvider);
@@ -137,7 +138,7 @@ class BudgetScreen extends ConsumerWidget {
                                 style: Theme.of(context).textTheme.bodySmall,
                               ),
                               Text(
-                                '\$${spending.toStringAsFixed(2)}',
+                                'RM${spending.toStringAsFixed(2)}',
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
                             ],
@@ -165,7 +166,7 @@ class BudgetScreen extends ConsumerWidget {
                                 style: Theme.of(context).textTheme.bodySmall,
                               ),
                               Text(
-                                '\$${remaining.abs().toStringAsFixed(2)}',
+                                'RM${remaining.abs().toStringAsFixed(2)}',
                                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                       color: remaining >= 0
                                           ? AppColors.success
@@ -178,7 +179,7 @@ class BudgetScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Limit: \$${category.monthlyLimit.toStringAsFixed(2)}',
+                        'Limit: RM${category.monthlyLimit.toStringAsFixed(2)}',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: Colors.grey[600],
                             ),

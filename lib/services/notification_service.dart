@@ -149,9 +149,9 @@ class NotificationService {
 
     String message;
     if (percentage >= 100) {
-      message = 'Budget exceeded for $categoryName! You\'ve spent \$${spent.toStringAsFixed(2)} of \$${limit.toStringAsFixed(2)}';
+      message = 'Budget exceeded for $categoryName! You\'ve spent RM${spent.toStringAsFixed(2)} of RM${limit.toStringAsFixed(2)}';
     } else if (percentage >= 80) {
-      message = 'Warning: $categoryName budget is ${percentage.toStringAsFixed(0)}% used (\$${spent.toStringAsFixed(2)} / \$${limit.toStringAsFixed(2)})';
+      message = 'Warning: $categoryName budget is ${percentage.toStringAsFixed(0)}% used (RM${spent.toStringAsFixed(2)} / RM${limit.toStringAsFixed(2)})';
     } else {
       return; // Don't send notification if under 80%
     }
