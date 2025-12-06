@@ -14,6 +14,7 @@ import '../../finance/screens/finance_screen.dart';
 import '../../finance/providers/expense_provider.dart';
 import '../../insights/screens/insights_screen.dart';
 import '../../settings/screens/settings_screen.dart';
+import '../../settings/screens/notifications_screen.dart';
 import '../../../services/preferences_service.dart';
 
 /// Home/Dashboard screen - Main entry point with bottom navigation
@@ -65,7 +66,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ),
             onPressed: () {
-              // TODO: Navigate to notifications
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const NotificationsScreen(),
+                ),
+              );
             },
           ),
           const SizedBox(width: 8),
