@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:intl/intl.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/utils/date_helper.dart';
+import '../../settings/providers/currency_provider.dart';
 import '../../finance/providers/expense_provider.dart';
 import '../providers/streak_provider.dart';
 import '../providers/wellness_score_provider.dart';
@@ -570,7 +572,10 @@ class FinanceInsightsTab extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
           spendingTrendAsync.when(
-            data: (trend) => _buildSpendingTrendChart(context, trend),
+            data: (trend) {
+              final currency = ref.watch(currencyProvider);
+              return _buildSpendingTrendChart(context, trend, currency);
+            },
             loading: () => const CircularProgressIndicator(),
             error: (_, __) => const SizedBox.shrink(),
           ),
@@ -735,7 +740,7 @@ class FinanceInsightsTab extends ConsumerWidget {
     return icons[category] ?? Icons.category;
   }
 
-  Widget _buildSpendingTrendChart(BuildContext context, Map<String, dynamic> trend) {
+  Widget _buildSpendingTrendChart(BuildContext context, Map<String, dynamic> trend, String currency) {
     final trends = trend['trends'] as Map<String, double>;
     final entries = trends.entries.toList();
     
@@ -748,6 +753,17 @@ class FinanceInsightsTab extends ConsumerWidget {
     final range = maxValue - minValue;
     final chartMax = maxValue + (range * 0.2);
 
+    // Helper function to format values for Y-axis (abbreviated for large numbers)
+    String formatYAxisValue(double value) {
+      if (value >= 1000) {
+        // Format as "1.5K" for thousands
+        final kValue = value / 1000;
+        return '${kValue.toStringAsFixed(kValue % 1 == 0 ? 0 : 1)}K';
+      }
+      // For smaller values, show as integer
+      return value.toInt().toString();
+    }
+
     return SizedBox(
       height: 250,
       child: LineChart(
@@ -757,8 +773,19 @@ class FinanceInsightsTab extends ConsumerWidget {
             leftTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
+                reservedSize: 50,
                 getTitlesWidget: (value, meta) {
-                  return Text('RM${value.toInt()}');
+                  final formattedValue = formatYAxisValue(value);
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: Text(
+                      'RM$formattedValue',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            fontSize: 10,
+                          ),
+                      textAlign: TextAlign.right,
+                    ),
+                  );
                 },
               ),
             ),
@@ -769,7 +796,17 @@ class FinanceInsightsTab extends ConsumerWidget {
                   if (value.toInt() < entries.length) {
                     final monthKey = entries[value.toInt()].key;
                     final parts = monthKey.split('-');
-                    return Text('${parts[1]}/${parts[0].substring(2)}');
+                    final year = int.parse(parts[0]);
+                    final month = int.parse(parts[1]);
+                    final date = DateTime(year, month, 1);
+                    // Format as "Dec" or "Jan" for better readability
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Text(
+                        DateFormat('MMM').format(date),
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    );
                   }
                   return const Text('');
                 },
