@@ -117,14 +117,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               onChanged: (value) async {
                 await PreferencesService.setWaterRemindersEnabled(value);
                 if (value) {
-                  // Schedule water reminders (every 2 hours from 8 AM to 6 PM)
-                  for (int hour = 8; hour <= 18; hour += 2) {
-                    await NotificationService.instance.scheduleWaterReminder(
-                      hour: hour,
-                      minute: 0,
-                      message: "Time for water! 💧 Don't forget to stay hydrated.",
-                    );
-                  }
+                  // Schedule water reminders from saved schedules
+                  await NotificationService.instance.scheduleAllWaterReminders();
                 } else {
                   await NotificationService.instance.cancelWaterReminders();
                 }
@@ -143,22 +137,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               onChanged: (value) async {
                 await PreferencesService.setMealRemindersEnabled(value);
                 if (value) {
-                  // Schedule meal reminders
-                  await NotificationService.instance.scheduleMealReminder(
-                    hour: 8,
-                    minute: 0,
-                    mealType: 'Breakfast',
-                  );
-                  await NotificationService.instance.scheduleMealReminder(
-                    hour: 13,
-                    minute: 0,
-                    mealType: 'Lunch',
-                  );
-                  await NotificationService.instance.scheduleMealReminder(
-                    hour: 19,
-                    minute: 0,
-                    mealType: 'Dinner',
-                  );
+                  // Schedule meal reminders from saved schedules
+                  await NotificationService.instance.scheduleAllMealReminders();
                 } else {
                   await NotificationService.instance.cancelMealReminders();
                 }
