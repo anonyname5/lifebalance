@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/utils/date_helper.dart';
+import '../../../core/utils/page_transitions.dart';
 import '../providers/savings_provider.dart';
 import '../../../data/models/savings_goal.dart';
 import 'add_savings_goal_screen.dart';
@@ -24,8 +25,8 @@ class SavingsGoalsScreen extends ConsumerWidget {
             onPressed: () async {
               await Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const AddSavingsGoalScreen(),
+                PageTransitions.slideUpRoute(
+                  const AddSavingsGoalScreen(),
                 ),
               );
               ref.invalidate(savingsNotifierProvider);

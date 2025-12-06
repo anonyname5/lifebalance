@@ -5,6 +5,7 @@ import '../../settings/providers/currency_provider.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/utils/date_helper.dart';
+import '../../../core/utils/page_transitions.dart';
 import '../../../core/widgets/gradient_card.dart';
 import '../../wellness/screens/wellness_screen.dart';
 import '../../wellness/screens/meal_logging_screen.dart';
@@ -68,8 +69,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const NotificationsScreen(),
+                PageTransitions.slideRoute(
+                  const NotificationsScreen(),
                 ),
               );
             },
@@ -95,8 +96,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const SettingsScreen(),
+                PageTransitions.slideRoute(
+                  const SettingsScreen(),
                 ),
               );
             },
@@ -169,22 +170,36 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildBody() {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      transitionBuilder: (Widget child, Animation<double> animation) {
+        return FadeTransition(
+          opacity: animation,
+          child: child,
+        );
+      },
+      child: _getCurrentScreen(),
+    );
+  }
+
+  Widget _getCurrentScreen() {
     switch (_currentIndex) {
       case 0:
-        return _buildDashboard();
+        return _buildDashboard(key: const ValueKey('dashboard'));
       case 1:
-        return _buildWellnessPlaceholder();
+        return _buildWellnessPlaceholder(key: const ValueKey('wellness'));
       case 2:
-        return _buildFinancePlaceholder();
+        return _buildFinancePlaceholder(key: const ValueKey('finance'));
       case 3:
-        return _buildInsightsPlaceholder();
+        return _buildInsightsPlaceholder(key: const ValueKey('insights'));
       default:
-        return _buildDashboard();
+        return _buildDashboard(key: const ValueKey('dashboard'));
     }
   }
 
-  Widget _buildDashboard() {
+  Widget _buildDashboard({Key? key}) {
     return SingleChildScrollView(
+      key: key,
       padding: const EdgeInsets.only(bottom: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -210,16 +225,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildWellnessPlaceholder() {
-    return const WellnessScreen();
+  Widget _buildWellnessPlaceholder({Key? key}) {
+    return WellnessScreen(key: key);
   }
 
-  Widget _buildFinancePlaceholder() {
-    return const FinanceScreen();
+  Widget _buildFinancePlaceholder({Key? key}) {
+    return FinanceScreen(key: key);
   }
 
-  Widget _buildInsightsPlaceholder() {
-    return const InsightsScreen();
+  Widget _buildInsightsPlaceholder({Key? key}) {
+    return InsightsScreen(key: key);
   }
 
   Widget _buildGreeting() {
@@ -388,8 +403,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => const MealLoggingScreen(),
+                    PageTransitions.slideRoute(
+                      const MealLoggingScreen(),
                     ),
                   );
                 },

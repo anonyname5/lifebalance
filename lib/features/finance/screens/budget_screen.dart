@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../core/utils/page_transitions.dart';
 import '../providers/budget_provider.dart';
 import '../../../data/models/budget_category.dart';
 import 'add_budget_category_screen.dart';
@@ -23,8 +24,8 @@ class BudgetScreen extends ConsumerWidget {
             onPressed: () async {
               await Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const AddBudgetCategoryScreen(),
+                PageTransitions.slideUpRoute(
+                  const AddBudgetCategoryScreen(),
                 ),
               );
               ref.invalidate(budgetProgressProvider);
