@@ -120,10 +120,10 @@ class BudgetScreen extends ConsumerWidget {
                         minHeight: 8,
                         backgroundColor: Colors.grey[200],
                         valueColor: progressValue >= 1.0
-                            ? AppColors.error
-                            : progressValue >= 0.8
-                                ? AppColors.warning
-                                : AppColors.success,
+                              ? AppColors.error
+                              : progressValue >= 0.8
+                                  ? AppColors.warning
+                                  : AppColors.success,
                         duration: const Duration(milliseconds: 1000),
                       ),
                       const SizedBox(height: 12),

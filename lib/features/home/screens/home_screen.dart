@@ -331,7 +331,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(8),
                         child: AnimatedProgressIndicator(
-                          value: progress > 1.0 ? 1.0 : progress,
+                            value: progress > 1.0 ? 1.0 : progress,
                           minHeight: 8,
                           backgroundColor: Colors.white.withOpacity(0.3),
                           valueColor: Colors.white,

@@ -8,6 +8,7 @@ import 'core/screens/splash_screen.dart';
 import 'features/settings/providers/theme_provider.dart';
 import 'services/notification_service.dart';
 import 'services/recurring_expense_service.dart';
+import 'services/widget_service.dart';
 
 /// Main app widget
 class App extends ConsumerStatefulWidget {
@@ -44,6 +45,9 @@ class _AppState extends ConsumerState<App> {
     // Check and auto-log recurring expenses
     final recurringService = RecurringExpenseService();
     await recurringService.checkAndLogRecurringExpenses();
+
+    // Update widget on app start
+    await WidgetService.updateWidget();
   }
 
   @override

@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/repositories/expense_repository.dart';
 import '../../../data/models/expense.dart';
 import '../../../core/utils/date_helper.dart';
+import '../../../services/widget_service.dart';
 import '../widgets/expense_filter_widget.dart';
 
 /// Expense repository provider
@@ -51,6 +52,9 @@ class ExpenseNotifier extends StateNotifier<AsyncValue<List<Expense>>> {
     try {
       await _repository.addExpense(expense);
       await _loadExpenses();
+      
+      // Update widget
+      await WidgetService.updateWidget();
     } catch (e, stackTrace) {
       state = AsyncValue.error(e, stackTrace);
     }
@@ -60,6 +64,9 @@ class ExpenseNotifier extends StateNotifier<AsyncValue<List<Expense>>> {
     try {
       await _repository.deleteExpense(id);
       await _loadExpenses();
+      
+      // Update widget
+      await WidgetService.updateWidget();
     } catch (e, stackTrace) {
       state = AsyncValue.error(e, stackTrace);
     }

@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/repositories/meal_repository.dart';
 import '../../../data/models/meal_log.dart';
 import '../../../core/utils/date_helper.dart';
+import '../../../services/widget_service.dart';
 import '../widgets/meal_filter_widget.dart';
 
 /// Meal repository provider
@@ -50,6 +51,9 @@ class MealNotifier extends StateNotifier<AsyncValue<List<MealLog>>> {
 
       await _repository.addMealLog(mealLog);
       await _loadMealLogs();
+      
+      // Update widget
+      await WidgetService.updateWidget();
     } catch (e, stackTrace) {
       state = AsyncValue.error(e, stackTrace);
     }
@@ -59,6 +63,9 @@ class MealNotifier extends StateNotifier<AsyncValue<List<MealLog>>> {
     try {
       await _repository.deleteMealLog(id);
       await _loadMealLogs();
+      
+      // Update widget
+      await WidgetService.updateWidget();
     } catch (e, stackTrace) {
       state = AsyncValue.error(e, stackTrace);
     }

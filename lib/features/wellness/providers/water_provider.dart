@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/repositories/water_repository.dart';
 import '../../../data/models/water_log.dart';
 import '../../../core/utils/date_helper.dart';
+import '../../../services/widget_service.dart';
 import '../widgets/water_filter_widget.dart';
 
 /// Water repository provider
@@ -52,6 +53,9 @@ class WaterNotifier extends StateNotifier<AsyncValue<List<WaterLog>>> {
 
       await _repository.addWaterLog(waterLog);
       await _loadWaterLogs();
+      
+      // Update widget
+      await WidgetService.updateWidget();
     } catch (e, stackTrace) {
       state = AsyncValue.error(e, stackTrace);
     }
@@ -61,6 +65,9 @@ class WaterNotifier extends StateNotifier<AsyncValue<List<WaterLog>>> {
     try {
       await _repository.deleteWaterLog(id);
       await _loadWaterLogs();
+      
+      // Update widget
+      await WidgetService.updateWidget();
     } catch (e, stackTrace) {
       state = AsyncValue.error(e, stackTrace);
     }

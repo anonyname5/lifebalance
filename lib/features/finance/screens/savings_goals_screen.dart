@@ -112,8 +112,8 @@ class SavingsGoalsScreen extends ConsumerWidget {
                         minHeight: 8,
                         backgroundColor: Colors.grey[200],
                         valueColor: goal.isGoalCompleted
-                            ? AppColors.success
-                            : AppColors.primary,
+                              ? AppColors.success
+                              : AppColors.primary,
                         duration: const Duration(milliseconds: 1000),
                       ),
                       const SizedBox(height: 12),
